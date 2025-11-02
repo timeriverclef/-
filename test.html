@@ -1,0 +1,644 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>青银桥 · 代际交流论坛</title>
+<meta name="description" content="连接青年与长辈的双向交流社区，陪伴、指导与共同成长。">
+<style>
+  :root{
+    --bg: #fafafa;
+    --card: #ffffff;
+    --fg: #1f2328;
+    --muted:#6b7280;
+    --line:#e5e7eb;
+    --brand:#2563eb;
+    --brand-weak:#dbeafe;
+    --good:#16a34a;
+    --warn:#b45309;
+    --danger:#b91c1c;
+    --senior:#7c3aed; /* 长辈徽章色 */
+    --youth:#059669;  /* 青年徽章色 */
+    --radius:14px;
+    --shadow:0 2px 10px rgba(0,0,0,.06);
+    --font: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji";
+    --fs-base:16px;
+    --fs-lg:18px;
+  }
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--fg);font-family:var(--font);
+    font-size:var(--fs-base);line-height:1.6;
+  }
+  /* 高对比度 */
+  body.high-contrast{
+    --bg:#ffffff; --card:#ffffff; --fg:#000; --muted:#111; --line:#000;
+    --brand:#000; --brand-weak:#fff; --shadow:none;
+  }
+  /* 大字模式 */
+  body.large-text{ font-size: var(--fs-lg); }
+  /* 简洁模式 */
+  body.simple-mode .decor{ display:none; }
+  body.simple-mode .aside{ display:none; }
+  .skip-link{position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden}
+  .skip-link:focus{left:8px;top:8px;width:auto;height:auto;background:#000;color:#fff;padding:6px 10px;z-index:10000;border-radius:8px}
+
+  header{
+    position:sticky;top:0;background:rgba(255,255,255,.8);backdrop-filter:saturate(180%) blur(10px);
+    border-bottom:1px solid var(--line);z-index:100;
+  }
+  .topbar{
+    max-width:1200px;margin:0 auto;display:flex;gap:12px;align-items:center;padding:10px 16px;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:700}
+  .logo .dot{width:12px;height:12px;border-radius:50%;background:var(--brand)}
+  .logo span{font-size:18px;letter-spacing:.5px}
+  .search{
+    flex:1;display:flex;align-items:center;background:var(--card);border:1px solid var(--line);
+    padding:6px 10px;border-radius:999px;box-shadow:var(--shadow);
+  }
+  .search input{border:none;outline:none;background:transparent;width:100%;font-size:14px}
+  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .toggle{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);
+    padding:6px 10px;border-radius:999px;font-size:13px;cursor:pointer;box-shadow:var(--shadow)}
+  .toggle input{accent-color:var(--brand)}
+
+  nav.tabs{
+    max-width:1200px;margin:0 auto;display:flex;gap:8px;align-items:center;padding:8px 16px 12px 16px;overflow-x:auto;
+  }
+  .tab{
+    padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:var(--card);
+    cursor:pointer;white-space:nowrap;font-size:14px;user-select:none;
+  }
+  .tab.active{background:var(--brand);color:#fff;border-color:var(--brand)}
+  main{
+    max-width:1200px;margin:14px auto;display:grid;grid-template-columns:280px 1fr;gap:16px;align-items:start;
+    padding:0 16px;
+  }
+  @media (max-width: 920px){ main{grid-template-columns:1fr} }
+  .aside{position:sticky;top:86px}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow);
+  }
+  .card .title{font-weight:700}
+  .aside .card{padding:14px}
+  .aside .group{display:flex;flex-direction:column;gap:10px}
+  .pill{
+    display:inline-flex;align-items:center;gap:6px;font-size:12px;padding:4px 8px;border-radius:999px;border:1px solid var(--line);background:#fff;
+  }
+  .pill[data-variant="brand"]{background:var(--brand-weak);border-color:#bfdbfe}
+  .pill input{accent-color:var(--brand)}
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;border:none;padding:10px 14px;border-radius:10px;
+    cursor:pointer;font-weight:600;background:var(--brand);color:#fff;
+  }
+  .btn.secondary{background:#111;color:#fff}
+  .btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+  .btn.small{padding:6px 10px;border-radius:8px;font-weight:600}
+  .btn:focus-visible{outline:3px solid #60a5fa;outline-offset:2px}
+
+  /* Feed */
+  #feed{ display:flex; flex-direction:column; gap:12px; }
+  article.post{
+    display:grid;grid-template-columns:56px 1fr;gap:12px;padding:14px;
+  }
+  .avatar{
+    width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#e0e7ff,#f5d0fe);display:flex;align-items:center;justify-content:center;font-weight:800;
+    color:#111;border:1px solid var(--line)
+  }
+  .post-head{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .name{font-weight:700}
+  .role-badge{font-size:11px;padding:3px 8px;border-radius:999px;border:1px solid var(--line);background:#fff}
+  .role-badge[data-role="senior"]{border-color:#ede9fe;background:#f5f3ff;color:var(--senior)}
+  .role-badge[data-role="youth"]{border-color:#d1fae5;background:#ecfdf5;color:var(--youth)}
+  .need-badge{font-size:11px;padding:3px 8px;border-radius:999px;background:#eef2ff;color:#3730a3;border:1px solid #e0e7ff}
+  .meta{font-size:12px;color:var(--muted)}
+  .tags{display:flex;flex-wrap:wrap;gap:6px}
+  .tag{font-size:11px;padding:3px 8px;border-radius:999px;border:1px dashed #cbd5e1;color:#334155;background:#f8fafc}
+  .post-title{font-size:16px;font-weight:800;margin:6px 0}
+  .post-body{color:#111}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+  .stat{font-size:12px;color:var(--muted)}
+
+  /* Dialog / Modal */
+  dialog{
+    border:none;border-radius:16px;max-width:720px;width:calc(100% - 32px);padding:0;box-shadow:0 20px 60px rgba(0,0,0,.25);
+  }
+  dialog::backdrop{background:rgba(0,0,0,.3)}
+  .modal{padding:18px}
+  .modal h3{margin:0 0 12px 0}
+  .form{display:grid;gap:12px}
+  .row{display:grid;gap:8px}
+  .row.h{grid-template-columns:1fr 1fr;gap:12px}
+  label{font-size:14px;font-weight:700}
+  input[type="text"], input[type="search"], textarea, select{
+    padding:10px;border-radius:10px;border:1px solid var(--line);background:#fff;font-size:14px
+  }
+  textarea{min-height:120px;resize:vertical}
+  .modal .footer{display:flex;justify-content:flex-end;gap:8px;margin-top:6px}
+  .hint{font-size:12px;color:var(--muted)}
+
+  /* Reduce animation if user prefers */
+  @media (prefers-reduced-motion: reduce){
+    *{scroll-behavior:auto !important;animation:none !important;transition:none !important}
+  }
+
+  /* Footer */
+  footer{padding:32px 16px;color:var(--muted);text-align:center}
+  .link{color:var(--brand);text-decoration:none;border-bottom:1px dashed var(--brand)}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">跳到主要内容</a>
+
+<header aria-label="站点头部">
+  <div class="topbar">
+    <div class="logo" aria-label="青银桥">
+      <span class="dot" aria-hidden="true"></span><span>青银桥</span>
+      <span class="decor" aria-hidden="true" style="font-weight:400;color:var(--muted)">｜连接青年与长辈</span>
+    </div>
+    <div class="search" role="search">
+      <svg width="18" height="18" aria-hidden="true" viewBox="0 0 24 24"><path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79L20 21.5L21.5 20L15.5 14m-6 0C7 14 5 12 5 9.5S7 5 9.5 5S14 7 14 9.5S12 14 9.5 14Z"/></svg>
+      <input id="searchInput" type="search" placeholder="搜索话题 / 标签 / 城市…" aria-label="搜索论坛内容" />
+    </div>
+    <div class="toolbar" role="group" aria-label="无障碍与显示设置">
+      <label class="toggle" title="大字模式">
+        <input id="toggleLarge" type="checkbox" />大字
+      </label>
+      <label class="toggle" title="高对比度">
+        <input id="toggleContrast" type="checkbox" />高对比
+      </label>
+      <label class="toggle" title="简洁模式（隐藏侧栏装饰）">
+        <input id="toggleSimple" type="checkbox" />简洁
+      </label>
+      <button class="btn small" id="btnCompose" aria-haspopup="dialog">＋ 发帖</button>
+    </div>
+  </div>
+
+  <nav class="tabs" aria-label="板块导航" id="tabs"></nav>
+</header>
+
+<main id="main">
+  <!-- 侧栏 -->
+  <aside class="aside" aria-label="快速筛选与发帖">
+    <div class="card group" role="region" aria-label="快速发布">
+      <div class="title">快速发布</div>
+      <div class="hint">选择你的意图，我们会为你选择合适板块与模板。</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn ghost" data-fast="ask">我想<span style="font-weight:800">求指导</span></button>
+        <button class="btn ghost" data-fast="offer">我能<span style="font-weight:800">提供指导/陪伴</span></button>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--line)" />
+      <div class="title">常用筛选</div>
+      <label class="pill"><input id="onlySenior" type="checkbox" />只看长辈</label>
+      <label class="pill"><input id="onlyYouth" type="checkbox" />只看青年</label>
+      <label class="pill"><input id="onlyComp" type="checkbox" />只看陪伴</label>
+      <label class="pill"><input id="onlyGuide" type="checkbox" />只看指导</label>
+
+      <div class="title" style="margin-top:8px">兴趣标签</div>
+      <div id="interestFilters" style="display:flex;flex-wrap:wrap;gap:8px"></div>
+    </div>
+
+    <div class="card group" role="region" aria-label="社区提示" style="margin-top:12px">
+      <div class="title">安全与友好</div>
+      <ul style="margin:8px 0 0 18px;padding:0">
+        <li>私下转账需谨慎，线下见面请结伴并告知家人；</li>
+        <li>尊重彼此称呼与作息；</li>
+        <li>欢迎使用“举报”与“感谢”。</li>
+      </ul>
+    </div>
+  </aside>
+
+  <!-- 信息流 -->
+  <section id="feed" aria-live="polite" aria-busy="false"></section>
+</main>
+
+<footer>
+  <div>© 青银桥 • 一起把生活过得更有温度。 · <a class="link" href="#" onclick="alert('社区规范（样例）：互相尊重、保护隐私、谨慎线下、反对年龄歧视。');return false;">社区规范</a></div>
+</footer>
+
+<!-- 发帖弹窗 -->
+<dialog id="composeDialog" aria-label="发布内容">
+  <form method="dialog" class="modal" id="composeForm">
+    <h3>发布内容</h3>
+    <div class="form">
+      <div class="row h">
+        <div class="row">
+          <label for="role">你的身份</label>
+          <select id="role" required>
+            <option value="youth">青年</option>
+            <option value="senior">长辈</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="intent">交流意图</label>
+          <select id="intent" required>
+            <option value="ask_guidance">求指导</option>
+            <option value="offer_guidance">提供指导</option>
+            <option value="seek_companionship">求陪伴</option>
+            <option value="offer_companionship">提供陪伴</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row h">
+        <div class="row">
+          <label for="category">发布到</label>
+          <select id="category" required>
+            <option>陪伴广场</option>
+            <option>青年问答</option>
+            <option>长辈讲堂</option>
+            <option>技能互助</option>
+            <option>故事馆</option>
+            <option>活动</option>
+            <option>资源库</option>
+            <option>站务</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="city">城市（选填）</label>
+          <input id="city" type="text" placeholder="如：成都 / 上海" />
+        </div>
+      </div>
+
+      <div class="row">
+        <label for="title">标题</label>
+        <input id="title" type="text" required placeholder="一句话说清你的主题" />
+      </div>
+
+      <div class="row">
+        <label for="content">正文</label>
+        <textarea id="content" required placeholder="具体想聊/能帮的是什么？希望什么时候交流？是否可语音/视频？"></textarea>
+      </div>
+
+      <div class="row h">
+        <div class="row">
+          <label for="tags">标签（用逗号分隔）</label>
+          <input id="tags" type="text" placeholder="如：数码, 健康, 编程" />
+        </div>
+        <div class="row">
+          <label for="voice">语音入口</label>
+          <select id="voice">
+            <option value="no">不需要</option>
+            <option value="yes">可语音/语音帖</option>
+          </select>
+          <div class="hint">原型占位：后续可接入录音/播报。</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer">
+      <button class="btn ghost" value="cancel">取消</button>
+      <button class="btn" id="submitPost" value="submit">发布</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- 举报弹窗 -->
+<dialog id="reportDialog" aria-label="举报">
+  <form method="dialog" class="modal" id="reportForm">
+    <h3>举报内容</h3>
+    <div class="form">
+      <div class="row">
+        <label for="reason">原因</label>
+        <select id="reason" required>
+          <option>广告/水贴</option>
+          <option>辱骂/歧视</option>
+          <option>诈骗/收费诱导</option>
+          <option>其它</option>
+        </select>
+      </div>
+      <div class="row">
+        <label for="reasonDetail">补充（选填）</label>
+        <textarea id="reasonDetail" placeholder="简要说明情况"></textarea>
+      </div>
+    </div>
+    <div class="footer">
+      <button class="btn ghost" value="cancel">取消</button>
+      <button class="btn" value="submit">提交</button>
+    </div>
+  </form>
+</dialog>
+
+<script>
+/** ---------- 基础数据与状态 ---------- **/
+const categories = ["全部","陪伴广场","青年问答","长辈讲堂","技能互助","故事馆","活动","资源库","站务"];
+const interestsPool = ["数码","烹饪","摄影","传统手艺","编程","理财","运动","健康","求职","旅行","书法","园艺"];
+const $ = (sel, root=document) => root.querySelector(sel);
+const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+const state = {
+  category: "全部",
+  query: "",
+  onlySenior: false,
+  onlyYouth: false,
+  onlyComp: false,
+  onlyGuide: false,
+  interestFilter: new Set(),
+  sort: "最新",
+  thanked: new Set(JSON.parse(localStorage.getItem('thanked')||'[]')),
+  starred: new Set(JSON.parse(localStorage.getItem('starred')||'[]')),
+};
+
+const samplePosts = [
+  {id:"p1", name:"王阿姨", role:"senior", age:62, city:"上海", interests:["健康","烹饪"], category:"陪伴广场",
+   need:"offer_companionship", title:"晚上7-8点，线上散步聊天么？", body:"退休后时间多，喜欢听年轻人分享工作趣事，也能聊养花做菜。", tags:["陪伴","园艺"], thanks:12, stars:4, time:"2025-10-28T19:00:00", voice:false},
+  {id:"p2", name:"李想", role:"youth", age:24, city:"成都", interests:["编程","求职"], category:"青年问答",
+   need:"ask_guidance", title:"第一次入职与长辈同事沟通，有什么忌讳/建议？", body:"刚毕业进了国企，想请教如何说话更得体、怎么请教不冒犯。", tags:["职场","沟通"], thanks:21, stars:8, time:"2025-10-31T09:30:00", voice:false},
+  {id:"p3", name:"赵叔", role:"senior", age:67, city:"北京", interests:["理财","运动"], category:"长辈讲堂",
+   need:"offer_guidance", title:"房贷提前还还是投资？给孩子/孙辈的理财框架", body:"做了30年银行，给出风险分级与家庭资产配置的简单模板。", tags:["理财","家庭"], thanks:45, stars:15, time:"2025-10-25T13:00:00", voice:true},
+  {id:"p4", name:"Annie", role:"youth", age:28, city:"深圳", interests:["数码","摄影"], category:"技能互助",
+   need:"ask_guidance", title:"给奶奶换智能机，如何设置更适老？", body:"需要手把手清单：字体、图标、常用联系人、诈骗拦截、视频通话一键。", tags:["数码","适老化"], thanks:9, stars:3, time:"2025-10-29T10:10:00", voice:false},
+  {id:"p5", name:"陈爷爷", role:"senior", age:72, city:"南京", interests:["传统手艺","书法"], category:"故事馆",
+   need:"offer_guidance", title:"小时候的竹编与如今的手作：一张图教你上手", body:"分享几种常见编法以及如何在家安全处理竹篾。", tags:["手作","非遗"], thanks:33, stars:20, time:"2025-09-18T08:30:00", voice:true},
+  {id:"p6", name:"Liu", role:"youth", age:26, city:"杭州", interests:["运动","旅行"], category:"活动",
+   need:"seek_companionship", title:"周末西湖慢走团（长辈优先）", body:"周六上午9点，3公里慢走，互相介绍兴趣爱好。", tags:["线下","杭州"], thanks:6, stars:7, time:"2025-10-30T09:00:00", voice:false},
+  {id:"p7", name:"孙姨", role:"senior", age:60, city:"青岛", interests:["健康","园艺"], category:"青年问答",
+   need:"offer_guidance", title:"年轻人护嗓与颈椎：声带与坐姿小贴士", body:"长期办公室工作要注意这些动作与频率。", tags:["健康","颈椎"], thanks:14, stars:5, time:"2025-10-22T15:22:00", voice:false},
+  {id:"p8", name:"小唐", role:"youth", age:21, city:"西安", interests:["学习","编程"], category:"青年问答",
+   need:"ask_guidance", title:"如何礼貌拒绝亲戚的职业建议？", body:"过年快到了，求几句不伤人又有效的表达。", tags:["家庭","沟通"], thanks:18, stars:4, time:"2025-10-27T19:40:00", voice:false},
+  {id:"p9", name:"张老师", role:"senior", age:66, city:"广州", interests:["教育","阅读"], category:"长辈讲堂",
+   need:"offer_guidance", title:"给刚工作的你：写邮件的三个层次", body:"结构化表达、读者意识、“一屏读完”的技巧。", tags:["职场","写作"], thanks:52, stars:29, time:"2025-10-19T11:15:00", voice:false},
+  {id:"p10", name:"Cora", role:"youth", age:29, city:"上海", interests:["理财","摄影"], category:"技能互助",
+   need:"offer_companionship", title:"午休 12:30-13:00 陪外婆视频吃饭", body:"愿意陪聊，也可以帮设置常用联系人快速拨号。", tags:["陪伴","视频"], thanks:11, stars:3, time:"2025-10-28T12:30:00", voice:false},
+  {id:"p11", name:"刘阿姨", role:"senior", age:64, city:"厦门", interests:["烹饪","旅行"], category:"故事馆",
+   need:"offer_guidance", title:"闽南味：手把手教海蛎煎", body:"从选料到火候，家常与宴客的差别。", tags:["烹饪","家常菜"], thanks:40, stars:12, time:"2025-10-01T10:00:00", voice:true},
+  {id:"p12", name:"Neo", role:"youth", age:23, city:"长沙", interests:["求职","数码"], category:"青年问答",
+   need:"ask_guidance", title:"第一份工作该不该离开家乡城市？", body:"机会 vs. 家人陪伴，想听长辈经验。", tags:["选择","职场"], thanks:17, stars:5, time:"2025-10-20T20:05:00", voice:false},
+];
+
+let posts = [...samplePosts];
+
+/** ---------- 初始化 UI ---------- **/
+const tabs = $("#tabs");
+const feed = $("#feed");
+const composeDialog = $("#composeDialog");
+const reportDialog = $("#reportDialog");
+
+function mountTabs(){
+  tabs.innerHTML = "";
+  categories.forEach(c=>{
+    const el = document.createElement("button");
+    el.className = "tab" + (c===state.category?" active":"");
+    el.textContent = c;
+    el.setAttribute("role","tab");
+    el.setAttribute("aria-selected", c===state.category ? "true":"false");
+    el.dataset.category = c;
+    tabs.appendChild(el);
+  });
+}
+mountTabs();
+
+/** 兴趣筛选 */
+function mountInterestFilters(){
+  const host = $("#interestFilters");
+  host.innerHTML = "";
+  interestsPool.forEach(t=>{
+    const label = document.createElement("label");
+    label.className = "pill";
+    label.innerHTML = `<input type="checkbox" data-tag="${t}">${t}`;
+    host.appendChild(label);
+  });
+}
+mountInterestFilters();
+
+/** ---------- 渲染帖子 ---------- **/
+const needMap = {
+  ask_guidance: "求指导",
+  offer_guidance: "提供指导",
+  seek_companionship: "求陪伴",
+  offer_companionship: "提供陪伴",
+};
+
+function fmtTime(iso){
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+function initials(name){
+  return name.replace(/[^\u4e00-\u9fa5a-zA-Z]/g,'').slice(0,2).toUpperCase() || "友";
+}
+
+function render(){
+  feed.setAttribute("aria-busy","true");
+  let list = posts.slice();
+
+  // 分类
+  if(state.category!=="全部"){
+    list = list.filter(p=>p.category===state.category);
+  }
+  // 搜索
+  const q = state.query.trim().toLowerCase();
+  if(q){
+    list = list.filter(p => (
+      p.title.toLowerCase().includes(q) ||
+      p.body.toLowerCase().includes(q) ||
+      p.tags.join(",").toLowerCase().includes(q) ||
+      (p.city||"").toLowerCase().includes(q)
+    ));
+  }
+  // 身份筛选
+  if(state.onlySenior && !state.onlyYouth){
+    list = list.filter(p=>p.role==="senior");
+  }else if(state.onlyYouth && !state.onlySenior){
+    list = list.filter(p=>p.role==="youth");
+  }
+  // 意图筛选
+  if(state.onlyComp && !state.onlyGuide){
+    list = list.filter(p=>p.need.includes("companionship"));
+  }else if(state.onlyGuide && !state.onlyComp){
+    list = list.filter(p=>p.need.includes("guidance"));
+  }
+  // 兴趣标签
+  if(state.interestFilter.size){
+    list = list.filter(p => p.tags.some(t=>state.interestFilter.has(t)) || p.interests.some(t=>state.interestFilter.has(t)));
+  }
+  // 排序
+  list.sort((a,b)=>{
+    if(state.sort==="感谢最多") return b.thanks - a.thanks;
+    return new Date(b.time) - new Date(a.time);
+  });
+
+  // 渲染
+  feed.innerHTML = "";
+  if(!list.length){
+    const empty = document.createElement("div");
+    empty.className = "card";
+    empty.style.padding = "24px";
+    empty.innerHTML = `<div style="font-weight:700">这里暂时没有内容</div><div class="hint">试试更换筛选条件，或者 <button class="btn small" id="emptyCompose">去发一帖</button></div>`;
+    feed.appendChild(empty);
+    $("#emptyCompose")?.addEventListener("click",()=>openCompose());
+  }
+
+  list.forEach(p=>{
+    const art = document.createElement("article");
+    art.className = "post card";
+    art.dataset.id = p.id;
+    art.innerHTML = `
+      <div class="avatar" aria-hidden="true">${initials(p.name)}</div>
+      <div>
+        <div class="post-head">
+          <span class="name">${p.name}</span>
+          <span class="role-badge" data-role="${p.role}">${p.role==="senior"?"长辈":"青年"}</span>
+          <span class="need-badge">${needMap[p.need] || "交流"}</span>
+          ${p.voice ? `<span class="pill" title="语音可用">🎤 语音</span>`:""}
+          <span class="meta">· ${p.city||"线上"} · ${fmtTime(p.time)}</span>
+        </div>
+        <div class="post-title">${p.title}</div>
+        <div class="post-body">${p.body}</div>
+        <div class="tags" style="margin-top:6px">
+          ${p.tags.map(t=>`<span class="tag" role="note">#${t}</span>`).join("")}
+        </div>
+        <div class="actions">
+          <button class="btn small" data-act="thank" aria-label="表示感谢">感谢 <span class="stat" data-k="thanks">(${p.thanks})</span></button>
+          <button class="btn small ghost" data-act="star" aria-label="收藏">收藏 <span class="stat" data-k="stars">(${p.stars})</span></button>
+          <button class="btn small ghost" data-act="reply">留言</button>
+          <button class="btn small ghost" data-act="dm">私信</button>
+          <button class="btn small ghost" data-act="report">举报</button>
+          ${p.category==="活动" ? `<button class="btn small" data-act="join">报名活动</button>`:""}
+        </div>
+      </div>
+    `;
+    // 已感谢/已收藏状态
+    if(state.thanked.has(p.id)){
+      art.querySelector('[data-act="thank"]').disabled = true;
+      art.querySelector('[data-act="thank"]').title = "已感谢";
+    }
+    if(state.starred.has(p.id)){
+      art.querySelector('[data-act="star"]').classList.remove('ghost');
+    }
+    feed.appendChild(art);
+  });
+
+  feed.setAttribute("aria-busy","false");
+}
+render();
+
+/** ---------- 事件绑定 ---------- **/
+tabs.addEventListener("click",(e)=>{
+  const btn = e.target.closest(".tab");
+  if(!btn) return;
+  state.category = btn.dataset.category;
+  mountTabs(); render();
+  tabs.scrollIntoView({behavior:"smooth",block:"nearest"});
+});
+
+$("#searchInput").addEventListener("input",(e)=>{ state.query = e.target.value; render(); });
+
+$("#onlySenior").addEventListener("change",e=>{ state.onlySenior = e.target.checked; render(); });
+$("#onlyYouth").addEventListener("change",e=>{ state.onlyYouth = e.target.checked; render(); });
+$("#onlyComp").addEventListener("change",e=>{ state.onlyComp = e.target.checked; render(); });
+$("#onlyGuide").addEventListener("change",e=>{ state.onlyGuide = e.target.checked; render(); });
+
+$("#interestFilters").addEventListener("change",(e)=>{
+  const cb = e.target;
+  if(cb && cb.dataset.tag){
+    if(cb.checked) state.interestFilter.add(cb.dataset.tag);
+    else state.interestFilter.delete(cb.dataset.tag);
+    render();
+  }
+});
+
+/** 信息流行为（感谢、收藏、留言、私信、举报、报名） */
+feed.addEventListener("click",(e)=>{
+  const btn = e.target.closest("button");
+  if(!btn) return;
+  const card = e.target.closest("article.post");
+  const id = card?.dataset.id;
+  const p = posts.find(x=>x.id===id);
+  if(!p) return;
+
+  const act = btn.dataset.act;
+  if(act==="thank"){
+    if(state.thanked.has(id)) return;
+    p.thanks += 1; state.thanked.add(id); btn.disabled = true;
+    localStorage.setItem('thanked', JSON.stringify(Array.from(state.thanked)));
+    card.querySelector('[data-k="thanks"]').textContent = `(${p.thanks})`;
+  }
+  if(act==="star"){
+    if(state.starred.has(id)){ state.starred.delete(id); p.stars = Math.max(0, p.stars-1); btn.classList.add("ghost"); }
+    else { state.starred.add(id); p.stars += 1; btn.classList.remove("ghost"); }
+    localStorage.setItem('starred', JSON.stringify(Array.from(state.starred)));
+    card.querySelector('[data-k="stars"]').textContent = `(${p.stars})`;
+  }
+  if(act==="reply"){
+    alert("留言示例：后端接入后可弹出评论框并@对方。");
+  }
+  if(act==="dm"){
+    alert("私信示例：初期建议仅允许相互关注后私信，降低骚扰风险。");
+  }
+  if(act==="report"){
+    reportDialog.showModal();
+    reportDialog.returnValue = "";
+    reportDialog.addEventListener("close", function onClose(){
+      reportDialog.removeEventListener("close", onClose);
+      if(reportDialog.returnValue!=="cancel" && $("#reason").value){
+        alert("已收到举报，我们会尽快处理。感谢守护社区。");
+      }
+    });
+  }
+  if(act==="join"){
+    alert("报名成功（示例）。实际应弹出报名表与安全须知确认。");
+  }
+});
+
+/** 发帖流程 */
+function openCompose(pref){
+  // 预设：快速入口可设置意图与板块
+  if(pref){
+    $("#intent").value = pref.intent;
+    $("#category").value = pref.category;
+    $("#role").value = pref.role;
+  }
+  composeDialog.showModal();
+}
+$("#btnCompose").addEventListener("click",()=>openCompose());
+$$('[data-fast]').forEach(b=>{
+  b.addEventListener("click",()=>{
+    const t = b.dataset.fast;
+    if(t==="ask"){ openCompose({intent:"ask_guidance", category:"青年问答", role:"youth"}); }
+    else { openCompose({intent:"offer_guidance", category:"长辈讲堂", role:"senior"}); }
+  });
+});
+$("#composeForm").addEventListener("submit",(e)=>{
+  if(e.submitter?.value==="cancel"){ return; }
+  e.preventDefault();
+  const p = {
+    id: "p"+(Date.now()),
+    name: $("#role").value==="senior" ? "热心长辈" : "热心青年",
+    role: $("#role").value,
+    age: $("#role").value==="senior" ? 60 : 25,
+    city: $("#city").value.trim(),
+    interests: [],
+    category: $("#category").value,
+    need: $("#intent").value,
+    title: $("#title").value.trim(),
+    body: $("#content").value.trim(),
+    tags: $("#tags").value.split(",").map(s=>s.trim()).filter(Boolean),
+    thanks: 0, stars: 0,
+    time: new Date().toISOString(),
+    voice: $("#voice").value==="yes"
+  };
+  if(!p.title || !p.body){ alert("请填写标题与正文"); return; }
+  posts.unshift(p);
+  composeDialog.close();
+  state.category = "全部"; mountTabs(); render();
+  window.scrollTo({top:0, behavior:"smooth"});
+});
+
+/** 外观开关（大字/高对比/简洁），持久化到 localStorage */
+function initAppearance(){
+  const set = (key, cls, el) => {
+    const saved = localStorage.getItem(key)==="1";
+    if(saved){ document.body.classList.add(cls); el.checked = true; }
+    el.addEventListener("change",()=>{
+      document.body.classList.toggle(cls, el.checked);
+      localStorage.setItem(key, el.checked ? "1":"0");
+    });
+  };
+  set("pref_large","large-text", $("#toggleLarge"));
+  set("pref_contrast","high-contrast", $("#toggleContrast"));
+  set("pref_simple","simple-mode", $("#toggleSimple"));
+}
+initAppearance();
+</script>
+</body>
+</html>
